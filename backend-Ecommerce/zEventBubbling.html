@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Bubbling & Propagation</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("outer").addEventListener("click", ()=> {
+                alert("Outer Div Clicked (Bubbling)");
+            }, false);
+            
+            document.getElementById("middle").addEventListener("click", ()=> {
+                alert("Middle Div Clicked (Bubbling)");
+            }, false);
+            
+            document.getElementById("inner").addEventListener("click",(event)=> {
+                alert("Inner Div Clicked (Stopping Propagation)");
+                event.stopPropagation();
+            }, false);
+        });
+    </script>
+    <style>
+        .box { padding: 20px; margin: 10px; text-align: center; }
+        #outer { background-color: lightblue; }
+        #middle { background-color: lightcoral; }
+        #inner { background-color:  lightgreen; }
+    </style>
+</head>
+<body>
+    <div id="outer" class="box">
+        Outer Div
+        <div id="middle" class="box">
+            Middle Div
+            <div id="inner" class="box">Inner Div</div>
+        </div>
+    </div>
+</body>
+</html>
+
