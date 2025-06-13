@@ -8,6 +8,7 @@ function OrderConfirmation() {
   const { data, error, isLoading } = useGetOrderByIdQuery(orderId);
 
   const order = data?.data;
+  console.log("order: ", order);
 
 
   return (
@@ -54,10 +55,10 @@ function OrderConfirmation() {
           </section>
           <Bill
             items={order.orderedItemList.map((item) => ({
-              name: item.name,
+              // name: item.name,
               price: item.price,
-              quantity: item.quantity,
-              size: item.size,
+              quantity: item.quantity ?? 1,
+              // size: item.size,
               productId: item.productId,
             }))}
           />
