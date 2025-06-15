@@ -466,9 +466,7 @@ export const getSubCategoriesWithGender = asyncHandler(async (req, res) => {
   try {
     if (!gender) throw new ApiError(400, "gender should be present");
     subCategory = subCategory?.toUpperCase();
-    console.log("subcategory uppercase: ", subCategory);
     category = category?.toUpperCase();
-    console.log("category uppercase: ", category);
     const queryObject = {
       gender,
     };

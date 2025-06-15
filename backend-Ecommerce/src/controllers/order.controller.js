@@ -46,6 +46,10 @@ export const newOrderCreated = asyncHandler(async (req, res) => {
     "paymentMethod",
   ];
 
+  userOrderedInput.forEach((input, index) => {
+    console.log(`${fieldNames[index]}: ${input}`);
+  });
+
   // if any of field is absent then it throw error
   userOrderedInput.forEach((input, index) => {
     if (input === undefined) {

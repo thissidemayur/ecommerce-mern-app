@@ -9,7 +9,7 @@ function Cart() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cartSlice.items);
-  console.log("cartItems: ",cartItems)
+  console.log("cartItems: ", cartItems)
   const handleQuantityChange = (productId, size, quantity) => {
     dispatch(updateQuantity({ productId, size, quantity }));
   };
@@ -36,7 +36,7 @@ function Cart() {
       </header>
       <section className="w-full mx-auto md:flex md:justify-between md:items-start md:p-5 relative">
         <section className="flex flex-col md:w-[65%]">
-          {cartItems.length > 0 ? (
+          {cartItems?.length > 0 ? (
             cartItems.map((item) => (
               <div
                 key={`${item.productId}-${item.size}`}
@@ -60,7 +60,7 @@ function Cart() {
                     </button>
                     <span>{item.quantity}</span>
                     <button
-                      onClick={() => handleQuantityChange(item.productId, item.size,  item.quantity + 1)}
+                      onClick={() => handleQuantityChange(item.productId, item.size, item.quantity + 1)}
                       className="px-2 py-1 border rounded"
                     >
                       +
