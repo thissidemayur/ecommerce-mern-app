@@ -260,7 +260,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 export const getFilteredProductsForUsers = async (req, res) => {
   try {
     // Destructure query parameters
-    const {
+    let {
       categories,
       price,
       sort,
@@ -280,19 +280,27 @@ export const getFilteredProductsForUsers = async (req, res) => {
 
     if (gender) query.gender = gender;
 
-    if (categories) query.categories = categories;
+    categories = categories.toUpperCase();
 
-    if (subCategories) query.subCategories = subCategories;
+    if (categories)
+      query.categories = { $regex: new RegExp(`^${categories}$`, "i") };
+
+    if (typeof subCategories === "string") {
+      subCategories = subCategories.split(",");
+    }
+    if (subCategories) {
+      if (Array.isArray(subCategories)) {
+        subCategories = subCategories.map((item) => item.toUpperCase());
+      } else {
+        subCategories = [subCategories.toUpperCase()];
+      }
+
+      query.subCategories = { $in: subCategories };
+    }
 
     // Match on size and/or price inside `variants` array
-    if (size || price) {
-      query.variants = {
-        $elemMatch: {
-          ...(size && { size }),
-          ...(price && { price: { $lte: Number(price) } }),
-        },
-      };
-    }
+    if (size) query["variants.size"] = size;
+    if (price) query["variants.price"] = { $lte: Number(price) };
 
     // Full-text search using $text (only works if index is defined)
     if (search) {
@@ -327,6 +335,8 @@ export const getFilteredProductsForUsers = async (req, res) => {
       .select("productName brand discountedPrice createdAt productImg variants") // Optional: limit returned fields
       .lean(); // Return plain JS objects, not Mongoose documents
 
+    console.log("products::getFilteredProductsForUsers:= ", products);
+
     // Get total number of matching products for pagination
     const totalProductCount = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProductCount / itemsPerPage);
@@ -339,6 +349,7 @@ export const getFilteredProductsForUsers = async (req, res) => {
     //
     // ✅ Send response with products and pagination info
     //
+
     res.status(200).json({
       status: 200,
       products,
@@ -365,7 +376,6 @@ export const getSingleProduct = asyncHandler(async (req, res) => {
   let product;
 
   if (!productId) {
-    console.log("productId: ", productId);
     throw new ApiError(400, "Product ID is required in the route!");
   }
 

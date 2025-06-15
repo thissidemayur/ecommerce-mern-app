@@ -6,7 +6,7 @@ export const ApiProductAuth = createApi({
     baseUrl: `http://localhost:2000/api/v1/product`,
     credentials: "include",
   }),
-  tagTypes: ["Product"], // Capitalize for convention
+  tagTypes: ["Product"],
 
   endpoints: (builder) => ({
     // 🟢 CREATE product
@@ -16,7 +16,7 @@ export const ApiProductAuth = createApi({
         method: "POST",
         body: productDetail,
       }),
-      invalidatesTags: ["Product"], // Invalidate general product list cache
+      invalidatesTags: ["Product"],
     }),
 
     // 🟢 GET all user-visible products
@@ -37,7 +37,7 @@ export const ApiProductAuth = createApi({
       providesTags: ["Product"],
     }),
 
-    // 🟢 GET filter product
+    // 🟢 GET filtered product
     getFilteredProducts: builder.query({
       query: (queryData) => {
         const params = new URLSearchParams();
@@ -48,6 +48,7 @@ export const ApiProductAuth = createApi({
         });
         return `/allProduct?${params.toString()}`;
       },
+      providesTags: ["Product"],
     }),
 
     // 🟢 GET all admin products
@@ -68,24 +69,24 @@ export const ApiProductAuth = createApi({
       providesTags: (result, error, id) => [{ type: "Product", id }],
     }),
 
-    // 🟢 GET product by gender and  category
+    // 🟢 GET product by gender and subcategory
     getSubCategoriesWithGender: builder.query({
-      query: (gender, category) => ({
+      query: ({ gender, subCategory }) => ({
         url: `/getProductBySubCategory`,
         method: "POST",
-        body: gender,
-        category,
+        body: { gender, subCategory },
       }),
-      invalidatesTags: (result, error, id) => [{ type: "Product", id }],
+      providesTags: ["Product"],
     }),
 
+    // 🟢 GET all subcategories by category
     getAllSubCategories: builder.query({
       query: (category) => ({
         url: `/allSubCategories`,
         method: "POST",
         body: { category },
       }),
-      invalidatesTags: (result, error, id) => [{ type: "Product", id }],
+      providesTags: ["Product"],
     }),
 
     // 🔴 DELETE product
@@ -97,10 +98,10 @@ export const ApiProductAuth = createApi({
       invalidatesTags: (result, error, id) => [{ type: "Product", id }],
     }),
 
-    // 🟡 UPDATE product (FIXED)
+    // 🟡 UPDATE product
     updateProduct: builder.mutation({
       query: ({ id, data }) => ({
-        url: `updatedProduct/${id}`, // PUT to /:id
+        url: `/updateProduct/${id}`, // Ensure this matches your backend
         method: "PUT",
         body: data,
       }),
@@ -124,3 +125,12 @@ export const {
   useGetSubCategoriesWithGenderQuery,
   useGetAllSubCategoriesQuery,
 } = ApiProductAuth;
+
+/*
+NOTE:
+RTK Query allows only one argument to query to use multiple argument use object
+
+invalidatesTags is for mutations (POST/PUT/DELETE) that change data
+
+providesTags, which tells RTK Query what data this query provides (used for caching and refetching logic)
+*/
